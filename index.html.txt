@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Absensi RFID</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Dashboard Absensi RFID</h1>
+    <p>Data absensi otomatis dari kartu RFID</p>
+  </header>
+
+  <section class="ringkasan">
+    <div class="kartu hijau">
+      <h2 id="jumlahHadir">0</h2>
+      <p>Hadir</p>
+    </div>
+    <div class="kartu kuning">
+      <h2 id="jumlahTerlambat">0</h2>
+      <p>Terlambat</p>
+    </div>
+  </section>
+
+  <section class="tabel-area">
+    <div class="atas-tabel">
+      <h2>Absensi Hari Ini</h2>
+      <button onclick="muatAbsensi()">Muat Ulang</button>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>No</th>
+          <th>Nama</th>
+          <th>Kelas</th>
+          <th>Jam</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="isiTabel">
+        <tr><td colspan="5">Memuat data...</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <div id="notifikasi" class="notifikasi"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="script.js"></script>
+</body>
+</html>

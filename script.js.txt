@@ -1,0 +1,83 @@
+const SUPABASE_URL = "https://xxxx.supabase.co";
+const SUPABASE_KEY = "ISI_ANON_KEY_SUPABASE";
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+async function muatAbsensi() {
+  const hariIni = new Date().toISOString().slice(0, 10);
+
+  const { data, error } = await supabase
+    .from("absensi")
+    .select("*")
+    .eq("tanggal", hariIni)
+    .order("jam", { ascending: true });
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  tampilkanAbsensi(data);
+}
+
+function tampilkanAbsensi(data) {
+  const tbody = document.getElementById("isiTabel");
+  tbody.innerHTML = "";
+
+  if (data.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="5">Belum ada yang absen hari ini.</td>
+      </tr>
+    `;
+  }
+
+  let hadir = 0;
+  let terlambat = 0;
+
+  data.forEach((absen, index) => {
+    if (absen.status === "Hadir") hadir++;
+    if (absen.status === "Terlambat") terlambat++;
+
+    tbody.innerHTML += `
+      <tr>
+        <td>${index + 1}</td>
+        <td>${absen.nama}</td>
+        <td>${absen.kelas}</td>
+        <td>${absen.jam}</td>
+        <td class="status-${absen.status.toLowerCase()}">${absen.status}</td>
+      </tr>
+    `;
+  });
+
+  document.getElementById("jumlahHadir").textContent = hadir;
+  document.getElementById("jumlahTerlambat").textContent = terlambat;
+}
+
+function tampilkanNotifikasi(nama) {
+  const notif = document.getElementById("notifikasi");
+  notif.textContent = nama + " baru saja absen!";
+  notif.style.display = "block";
+
+  setTimeout(() => {
+    notif.style.display = "none";
+  }, 4000);
+}
+
+supabase
+  .channel("absensi-realtime")
+  .on(
+    "postgres_changes",
+    {
+      event: "INSERT",
+      schema: "public",
+      table: "absensi"
+    },
+    (payload) => {
+      tampilkanNotifikasi(payload.new.nama);
+      muatAbsensi();
+    }
+  )
+  .subscribe();
+
+muatAbsensi();
